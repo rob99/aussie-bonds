@@ -1,6 +1,6 @@
 require 'date'
 require 'time'
-require 'active_support'
+require 'active_support/core_ext'
 require 'financial/security/formulae_base'
 module Financial
   module Security
@@ -39,7 +39,7 @@ module Financial
       end
     
       def self.calculate_next_coupon_date(settlement_date, maturity_date, frequency)
-        test_date = maturity_date.to_time.months_ago(12/frequency)
+        test_date = maturity_date.to_datetime.months_ago(12/frequency)
         last_date = maturity_date
         while test_date.to_date > settlement_date
           last_date = test_date

@@ -47,7 +47,7 @@ class TestAussieBonds < Test::Unit::TestCase
     assert_equal(181, f.days_in_current_period)
     assert_equal(7, f.days_to_next_coupon)
     assert_equal(191, f.days_to_maturity)
-    assert_true(f.ex_interest)
+    assert_equal(true, f.ex_interest)
     assert_equal(Date.civil(2007, 8, 1), f.next_coupon_date)
     assert_equal(BigDecimal.new("3.375"), f.g)
     assert_equal(BigDecimal.new("-0.130525"), f.pph_interest)
