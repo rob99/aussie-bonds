@@ -1,6 +1,4 @@
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-
+require 'financial/security/formula_base'
 module Financial
   module Security
     module Rba

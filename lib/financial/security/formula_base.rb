@@ -1,7 +1,7 @@
 require 'bigdecimal'
 module Financial
   module Security
-    class FormulaeBase
+    class FormulaBase
       attr_accessor :face_value
       attr_accessor :calculation_notes, :calculation_sucessful, :validation_errors
       attr_accessor :settlement_date, :maturity_date

@@ -1,11 +1,11 @@
 require 'date'
 require 'time'
 require 'active_support/core_ext'
-require 'financial/security/formulae_base'
+require 'financial/security/formula_base'
 module Financial
   module Security
 
-    class CouponBearingBase < Financial::Security::FormulaeBase
+    class CouponBearingBase < Financial::Security::FormulaBase
   
       def coupon_rate=(value)
         @coupon_rate = BigDecimal(value.to_s, 24)
