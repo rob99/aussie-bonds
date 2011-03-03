@@ -16,6 +16,6 @@ class TreasuryNoteTest < Test::Unit::TestCase
     f.calculate
 
     assert_equal(BigDecimal.new("977402.68"), f.amount_settlement)
-
+    assert_equal(true, f.calculation_sucessful)
   end
 end

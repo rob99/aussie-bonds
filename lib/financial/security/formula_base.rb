@@ -27,5 +27,10 @@ module Financial
         return @float
       end
     end
+
+    def events(from, to)
+      raise NotImplementedError
+      {}
+    end
   end
 end

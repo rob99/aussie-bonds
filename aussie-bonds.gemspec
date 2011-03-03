@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{aussie-bonds}
-  s.version = "0.0.3"
+  s.version = "0.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Robert Brown"]
-  s.date = %q{2010-10-05}
+  s.date = %q{2010-10-23}
   s.description = %q{Pricing fomulae for Australian bonds}
   s.email = %q{robert.brown@treasurytechnology.com.au}
   s.extra_rdoc_files = [
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
      "lib/extensions.rb",
      "lib/financial/security/coupon_bearing_accrue_close.rb",
      "lib/financial/security/coupon_bearing_base.rb",
+     "lib/financial/security/formula_base.rb",
      "lib/financial/security/rba/capital_indexed.rb",
      "lib/financial/security/rba/fixed_interest.rb",
      "lib/financial/security/rba/floating_rate_note.rb",
@@ -43,9 +44,9 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{Pricing fomulae for Australian bonds}
   s.test_files = [
-    "test/treasury_note_test.rb",
-     "test/test_aussie-bonds.rb",
-     "test/helper.rb"
+    "test/test_aussie-bonds.rb",
+     "test/helper.rb",
+     "test/treasury_note_test.rb"
   ]
 
   if s.respond_to? :specification_version then

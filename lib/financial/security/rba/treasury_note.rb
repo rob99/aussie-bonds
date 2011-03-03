@@ -33,18 +33,23 @@ module Financial
             @amount_interest = BigDecimal("0")
             return
           end
-
-
-          # TODO: fix up how effective coupon date behaves
-          # for now just push weekends out to monday
           @effective_maturity_date = @maturity_date
 
           @days_to_maturity = @effective_maturity_date - @settlement_date
 
-          @amount_settlement = npv(@face_value + @amount_next_coupon, @yield_rate, @days_to_maturity, 365).round(2)
+          @amount_settlement = npv(@face_value, @yield_rate, @days_to_maturity, 365).round(2)
           @amount_interest = @face_value - @amount_settlement
           @calculation_successful = true
         end
+      end
+
+      EVENTS = [:issue, :settlement, :maturity]
+      def events(from, to)
+        retn = []
+        retn << {:date=>@maturity_date, :event=>:maturity} if @maturity_date && @maturity_date >= from && @maturity_date <= to
+        retn << {:date=>@issue_date, :event=>:issue} if @issue_date && @issue_date >= from && @issue_date <= to
+        retn << {:date=>@settlement_date, :event=>:issue} if @settlement_date && @settlement_date >= from && @settlement_date <= to
+        retn
       end
     end
   end

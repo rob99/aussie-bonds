@@ -54,9 +54,9 @@ class TestAussieBonds < Test::Unit::TestCase
     assert_equal(BigDecimal.new("33750"), f.amount_next_coupon)
     assert_equal(BigDecimal.new("1006056.20"), f.amount_settlement)
     assert_equal(BigDecimal.new("100.60562"), f.pph_settlement)
-    
+
     assert_equal(BigDecimal.new("100.475095"), f.pph_capital)
-    
+
   end
 
   def test_rba_fi_discount
@@ -76,20 +76,42 @@ class TestAussieBonds < Test::Unit::TestCase
     assert_equal(BigDecimal.new("1010390.02"), f.amount_settlement)
   end
 
-    def test_rba_fi_discount
+  def test_rba_fi_discount_ex
 
     f = Financial::Security::Rba::FixedInterest.new
-    f.settlement_date = Date.civil(2007, 9, 1)
+    f.settlement_date = Date.civil(2008, 1, 25)
     f.maturity_date = Date.civil(2008, 2, 1)
     f.face_value = 1000000
     f.coupon_rate = 6.75
     f.yield_rate = 5.5155
     f.calculate
 
-    assert_equal(BigDecimal.new("33750"), f.amount_next_coupon)
-    assert_equal(BigDecimal.new("1004703.88"), f.amount_capital)
-    assert_equal(BigDecimal.new("101.039002"), f.pph_settlement)
-    assert_equal(BigDecimal.new("1010390.02"), f.amount_settlement)
+    #assert_equal(BigDecimal.new("33750"), f.amount_next_coupon)
+    #assert_equal(BigDecimal.new("1004703.88"), f.amount_capital)
+    #assert_equal(BigDecimal.new("101.039002"), f.pph_settlement)
+    #assert_equal(BigDecimal.new("1010390.02"), f.amount_settlement)
   end
+
+  def test_rba_events
+
+    f = Financial::Security::Rba::FixedInterest.new
+    f.settlement_date = Date.civil(2011, 1, 3)
+    f.maturity_date = Date.civil(2011, 10, 15)
+    f.face_value = 1000000
+    f.coupon_rate = 6.75
+    f.yield_rate = 5.5155
+
+    r = f.events
+    puts r.inspect
+    assert r.include?({:date=>Date.civil(2011,4,7), :event=>:ci_end})
+    assert r.include?({:date=>Date.civil(2011,4,8), :event=>:ex_begin})
+    assert r.include?({:date=>Date.civil(2011,4,14), :event=>:ex_end})
+    assert r.include?({:date=>Date.civil(2011,4,15), :event=>:ci_begin})
+    assert r.include?({:date=>Date.civil(2011,4,15), :event=>:coupon})
+    assert r.include?({:date=>Date.civil(2011,10,15), :event=>:maturity})
+
+
+  end
+
 
 end
