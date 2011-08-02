@@ -1,6 +1,6 @@
 = aussie-bonds
 
-Description goes here.
+Bond pricing gem
 
 == Note on Patches/Pull Requests
  
