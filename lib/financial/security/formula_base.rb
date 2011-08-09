@@ -1,10 +1,11 @@
 require 'bigdecimal'
+require 'date'
 module Financial
   module Security
     class FormulaBase
       attr_accessor :face_value
-      attr_accessor :calculation_notes, :calculation_sucessful, :validation_errors
-      attr_accessor :settlement_date, :maturity_date
+      attr_accessor :calculation_notes, :calculation_successful, :validation_errors
+      attr_reader :settlement_date, :maturity_date
       attr_reader :face_value
       def yield_rate=(value)
         @yield_rate = BigDecimal(value.to_s, 24)
@@ -13,6 +14,12 @@ module Financial
         @face_value = BigDecimal(value.to_s, 24)
       end
 
+      def settlement_date=(value)
+	if value.is_a? String
+	   value = Date.strptime(value, '%Y-%m-%d')
+        end
+        @settlement_date = value
+      end
       def npv(amount, rate, days, day_count)
         return (day_count/(BigDecimal(days.to_s) * (rate / BigDecimal("100")) + day_count)) * amount
       end
@@ -26,11 +33,13 @@ module Financial
         #puts "<- " + @float.to_s
         return @float
       end
+
+      def events(from, to)
+        raise NotImplementedError
+        {}
+      end
+
     end
 
-    def events(from, to)
-      raise NotImplementedError
-      {}
-    end
   end
 end
