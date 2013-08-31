@@ -1,4 +1,4 @@
-require 'test/helper'
+require 'helper'
 require 'date'
 require 'financial/security/rba/fixed_interest'
 
@@ -97,12 +97,13 @@ class TestAussieBonds < Test::Unit::TestCase
     f = Financial::Security::Rba::FixedInterest.new
     f.settlement_date = Date.civil(2011, 1, 3)
     f.maturity_date = Date.civil(2011, 10, 15)
+  
     f.face_value = 1000000
     f.coupon_rate = 6.75
     f.yield_rate = 5.5155
 
     r = f.events
-    puts r.inspect
+
     assert r.include?({:date=>Date.civil(2011,4,7), :event=>:ci_end})
     assert r.include?({:date=>Date.civil(2011,4,8), :event=>:ex_begin})
     assert r.include?({:date=>Date.civil(2011,4,14), :event=>:ex_end})

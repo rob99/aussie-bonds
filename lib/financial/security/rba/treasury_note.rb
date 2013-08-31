@@ -3,12 +3,33 @@ module Financial
   module Security
     module Rba
       class TreasuryNote < FormulaBase
+        attr_accessor :amount_settlement, :amount_interest, :days_to_maturity, :days_in_year
         def initialize
           @settlement_date = Date.today
           @face_value = BigDecimal("0")
+          @days_in_year = 365
         end
 
         def calculate
+          calculate_settlement
+        end
+        def calculate_yield
+          validate
+          if (@validation_errors.size > 0)
+            @yield_rate = BigDecimal("0")
+            @amount_interest = BigDecimal("0")
+            return
+          end
+          @effective_maturity_date = @maturity_date
+          
+          @days_to_maturity = (@effective_maturity_date - @settlement_date).to_i
+
+          @yield_rate = yield(@face_value, @amount_settlement, @days_to_maturity, @days_in_year)
+          @amount_interest = @face_value - @amount_settlement
+          @calculation_successful = true
+        end
+
+        def validate
           @calculation_notes = Array.new
           @validation_errors = Array.new
           @calculation_successful = false
@@ -28,6 +49,9 @@ module Financial
             @validation_errors.push("Face Value required")
           end
 
+        end
+        def calculate_settlement
+          validate
           if (@validation_errors.size > 0)
             @amount_settlement = BigDecimal("0")
             @amount_interest = BigDecimal("0")
@@ -35,11 +59,11 @@ module Financial
           end
           @effective_maturity_date = @maturity_date
 
-          @days_to_maturity = @effective_maturity_date - @settlement_date
+          @days_to_maturity = (@effective_maturity_date - @settlement_date).to_i
 
-          @amount_settlement = npv(@face_value, @yield_rate, @days_to_maturity, 365).round(2)
+          @amount_settlement = npv(@face_value, @yield_rate, @days_to_maturity, @days_in_year).round(2)
           @amount_interest = @face_value - @amount_settlement
-          @calculation_successful = true
+          @calculation_successful = true 
         end
       end
 
@@ -51,6 +75,10 @@ module Financial
         retn << {:date=>@settlement_date, :event=>:issue} if @settlement_date && @settlement_date >= from && @settlement_date <= to
         retn
       end
+      
+      
+      
+      
     end
   end
 end

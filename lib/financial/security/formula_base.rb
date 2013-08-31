@@ -11,17 +11,29 @@ module Financial
         @yield_rate = BigDecimal(value.to_s, 24)
       end
       def face_value=(value)
-        @face_value = BigDecimal(value.to_s, 24)
+        @face_value = BigDecimal(value.to_s.gsub(',',''), 24)
       end
 
       def settlement_date=(value)
-	if value.is_a? String
-	   value = Date.strptime(value, '%Y-%m-%d')
+	      if value.is_a? String
+    	   value = Date.strptime(value, '%Y-%m-%d')
         end
         @settlement_date = value
       end
+      
+      def maturity_date=(value)
+      	if value.is_a? String
+           value = Date.strptime(value, '%Y-%m-%d')
+        end
+        @maturity_date = value
+      end
       def npv(amount, rate, days, day_count)
-        return (day_count/(BigDecimal(days.to_s) * (rate / BigDecimal("100")) + day_count)) * amount
+        #s = 365/d * (rate ) + 365) * a
+        (day_count/(BigDecimal(days.to_s) * (rate / BigDecimal("100")) + day_count)) * amount
+      end
+      def yield(fv, pv, days, day_count)
+        
+        (((fv/pv) - 1) * (day_count/BigDecimal.new(days.to_s)) ) * 100
       end
 
       def round(float, num_of_decimal_places)
@@ -38,6 +50,21 @@ module Financial
         raise NotImplementedError
         {}
       end
+      def map_params(args)
+        args.each do |k,v|
+          m = (k.to_s + '=').to_sym  
+          if respond_to? m
+            send(m, v)
+          end
+          m = (k.to_s + '=').gsub(/-/,'_').to_sym
+          if respond_to? m
+            send(m, v)
+          end  
+        end
+      end
+      
+      
+        
 
     end
 
