@@ -6,9 +6,9 @@ module Financial
       attr_accessor :face_value
       attr_accessor :calculation_notes, :calculation_successful, :validation_errors
       attr_reader :settlement_date, :maturity_date
-      attr_reader :face_value
+      attr_reader :face_value, :yield_rate
       def yield_rate=(value)
-        @yield_rate = BigDecimal(value.to_s, 24)
+        @yield_rate = BigDecimal(value, 16)
       end
       def face_value=(value)
         @face_value = BigDecimal(value.to_s.gsub(',',''), 24)
@@ -31,9 +31,8 @@ module Financial
         #s = 365/d * (rate ) + 365) * a
         (day_count/(BigDecimal(days.to_s) * (rate / BigDecimal("100")) + day_count)) * amount
       end
-      def yield(fv, pv, days, day_count)
-        
-        (((fv/pv) - 1) * (day_count/BigDecimal.new(days.to_s)) ) * 100
+      def price_to_yield(fv, pv, days, day_count)
+        (((fv/pv) - 1) * (day_count/BigDecimal.new(days)) ) * 100
       end
 
       def round(float, num_of_decimal_places)

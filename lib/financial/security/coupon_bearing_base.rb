@@ -23,8 +23,13 @@ module Financial
       # pph
       attr_accessor :pph_settlement, :pph_interest, :pph_capital
       # amounts
-      attr_accessor :amount_settlement, :amount_interest, :amount_capital
+      attr_accessor :amount_interest, :amount_capital
       attr_accessor :amount_next_coupon
+      attr_reader :amount_settlement
+      
+      def amount_settlement=(value)
+        @amount_settlement = BigDecimal(value.to_s.gsub(',',''), 2)
+      end
 
       def self.remaining_coupon_periods(settlement_date, maturity_date, frequency)
         test_date = maturity_date.to_time.months_ago(12/frequency)

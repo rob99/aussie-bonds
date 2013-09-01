@@ -37,7 +37,25 @@ class TreasuryNoteTest < Test::Unit::TestCase
   end
   def test_yield
     f = Financial::Security::Rba::TreasuryNote.new
-    y = f.yield(BigDecimal.new("139.58"), BigDecimal.new("138"), 64, 365)
+    y = f.price_to_yield(BigDecimal.new("139.58"), BigDecimal.new("138"), 64, 365)
     assert_equal(BigDecimal.new("6.52966"), y.round(5))
+  end
+  def test_yield2
+    f = Financial::Security::Rba::TreasuryNote.new
+    f.map_params({"settlement-date"=>"2013-08-31", "maturity-date"=>"2013-10-31", "face-value"=>"1,000,000.00", "discount-days-basis"=>"365", "amount-settlement"=>"950000", "solve-radio"=>"price-to-yield"})
+    f.calculate_yield
+    #pp f
+    assert_equal(BigDecimal.new("31.4926661"), f.yield_rate)
+    f.calculate_settlement
+    assert_equal(BigDecimal.new(950000), f.amount_settlement)
+  end
+  def test_yield3
+    f = Financial::Security::Rba::TreasuryNote.new
+    f.map_params({"settlement-date"=>"2013-09-01", "maturity-date"=>"2013-09-29", "face-value"=>"1,000,000.00", "discount-days-basis"=>"360", "amount-settlement"=>"987987", "solve-radio"=>"price-to-yield"})
+    f.calculate_yield
+    assert_equal(BigDecimal.new(987987), f.amount_settlement)
+    assert_equal(0, f.validation_errors.size)
+    f.calculate_settlement
+    assert_equal(BigDecimal.new(987987), f.amount_settlement)
   end
 end

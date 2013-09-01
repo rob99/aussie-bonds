@@ -91,6 +91,22 @@ class TestAussieBonds < Test::Unit::TestCase
     #assert_equal(BigDecimal.new("101.039002"), f.pph_settlement)
     #assert_equal(BigDecimal.new("1010390.02"), f.amount_settlement)
   end
+  
+  def test_rba_fi_ex
+    f = Financial::Security::Rba::FixedInterest.new
+    f.settlement_date = Date.civil(2007, 1, 25)
+    f.maturity_date = Date.civil(2008, 2, 1)
+    f.face_value = 1000000
+    f.coupon_rate = 6.75
+    #f.yield_rate = 5.51
+    f.amount_settlement = 1010860
+    f.calculate_yield
+
+    ##assert_equal(BigDecimal.new("101.214"), f.pph_capital)
+    #assert_equal(BigDecimal.new("-0.128"), f.pph_interest)
+    #assert_equal(BigDecimal.new("101.086"), f.pph_settlement)
+    #assert_equal(BigDecimal.new("1010860"), f.amount_settlement)
+  end
 
   def test_rba_events
 

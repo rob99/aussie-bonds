@@ -3,7 +3,11 @@ module Financial
   module Security
     module Rba
       class TreasuryNote < FormulaBase
-        attr_accessor :amount_settlement, :amount_interest, :days_to_maturity, :days_in_year
+        attr_accessor :amount_interest, :days_to_maturity, :days_in_year
+        attr_reader :amount_settlement
+        def amount_settlement=(value)
+          @amount_settlement = BigDecimal(value.to_s.gsub(',',''))
+        end
         def initialize
           @settlement_date = Date.today
           @face_value = BigDecimal("0")
@@ -15,6 +19,9 @@ module Financial
         end
         def calculate_yield
           validate
+          if (! @amount_settlement)
+            @validation_errors.push("Settlement Amount required")
+          end
           if (@validation_errors.size > 0)
             @yield_rate = BigDecimal("0")
             @amount_interest = BigDecimal("0")
@@ -24,7 +31,8 @@ module Financial
           
           @days_to_maturity = (@effective_maturity_date - @settlement_date).to_i
 
-          @yield_rate = yield(@face_value, @amount_settlement, @days_to_maturity, @days_in_year)
+          @yield_rate = price_to_yield(@face_value, @amount_settlement, @days_to_maturity, @days_in_year)
+          @yield_rate = @yield_rate.round(@face_value.truncate.to_s.size)
           @amount_interest = @face_value - @amount_settlement
           @calculation_successful = true
         end
@@ -42,9 +50,7 @@ module Financial
           if ((@maturity_date && @settlement_date) && @maturity_date < @settlement_date)
             @validation_errors.push("Maturity Date must be on or after Settlement Date")
           end
-          if (! @yield_rate)
-            @validation_errors.push("Yield Rate required")
-          end
+         
           if (! @face_value)
             @validation_errors.push("Face Value required")
           end
@@ -52,6 +58,9 @@ module Financial
         end
         def calculate_settlement
           validate
+          if (! @yield_rate)
+            @validation_errors.push("Yield Rate required")
+          end
           if (@validation_errors.size > 0)
             @amount_settlement = BigDecimal("0")
             @amount_interest = BigDecimal("0")

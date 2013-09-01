@@ -11,7 +11,7 @@ module Financial
         attr_reader :g, :an, :vn, :v, :i
         attr_reader :yield_rate
         def yield_rate=(value)
-          @yield_rate = BigDecimal(value.to_s)
+          @yield_rate = BigDecimal(value,10)
         end
 
         def initialize
@@ -30,32 +30,7 @@ module Financial
 
         def calculate
           @calculation_notes = Array.new
-          @validation_errors = Array.new
-          @calculation_successful = false
-          if (! @settlement_date)
-            @validation_errors.push("Settlement Date required")
-          end
-          if (! @maturity_date)
-            @validation_errors.push("Maturity Date required")
-          end
-          if ((@maturity_date && @settlement_date) && @maturity_date < @settlement_date)
-            @validation_errors.push("Maturity Date must be on or after Settlement Date")
-          end
-          if (! @coupon_rate)
-            @validation_errors.push("Coupon Rate required")
-          end
-          if (! @yield_rate)
-            @validation_errors.push("Yield Rate required")
-          end
-          if (@override_coupon_period_calc && (! @previous_coupon_date))
-            @validation_errors.push("Previous Coupon date required when Coupon Period Calculation Override on")
-          end
-          if (@override_coupon_period_calc && (! @next_coupon_date))
-            @validation_errors.push("Next Coupon date required when Coupon Period Calculation Override on")
-          end
-          if (! @face_value)
-            @validation_errors.push("Face Value required")
-          end
+          validate
 
           if (@validation_errors.size > 0)
             @amount_settlement = BigDecimal("0")
@@ -115,7 +90,7 @@ module Financial
           if @ex_interest
             @pph_interest = (BigDecimal.new(@days_to_next_coupon.to_s) / BigDecimal.new(@days_in_current_period.to_s)) * @g * -1
           else
-            @pph_interest = @g * ((@days_in_current_period - @days_to_next_coupon) / @days_in_current_period)
+            @pph_interest = @g * BigDecimal.new((@days_in_current_period - @days_to_next_coupon) / @days_in_current_period, 20)
           end
 
           if (@discount_mode)
@@ -147,7 +122,37 @@ module Financial
           @calculation_successful = true
 
         end
-
+        def calculate_settlement
+          calculate
+        end
+        def validate
+          @validation_errors = Array.new
+          @calculation_successful = false
+          if (! @settlement_date)
+            @validation_errors.push("Settlement Date required")
+          end
+          if (! @maturity_date)
+            @validation_errors.push("Maturity Date required")
+          end
+          if ((@maturity_date && @settlement_date) && @maturity_date < @settlement_date)
+            @validation_errors.push("Maturity Date must be on or after Settlement Date")
+          end
+          if (! @coupon_rate)
+            @validation_errors.push("Coupon Rate required")
+          end
+          if (! @yield_rate)
+            @validation_errors.push("Yield Rate required")
+          end
+          if (@override_coupon_period_calc && (! @previous_coupon_date))
+            @validation_errors.push("Previous Coupon date required when Coupon Period Calculation Override on")
+          end
+          if (@override_coupon_period_calc && (! @next_coupon_date))
+            @validation_errors.push("Next Coupon date required when Coupon Period Calculation Override on")
+          end
+          if (! @face_value)
+            @validation_errors.push("Face Value required")
+          end
+        end
 
       end
     end
