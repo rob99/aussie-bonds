@@ -28,7 +28,12 @@ module Financial
       attr_reader :amount_settlement
       
       def amount_settlement=(value)
-        @amount_settlement = BigDecimal(value.to_s.gsub(',',''), 2)
+        if value.is_a? String
+          @amount_settlement =  BigDecimal(value.gsub(',',''), 16)
+        else 
+          @amount_settlement =  BigDecimal(value, 16)
+        end
+        @amount_settlement
       end
 
       def self.remaining_coupon_periods(settlement_date, maturity_date, frequency)

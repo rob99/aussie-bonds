@@ -28,8 +28,11 @@ module Financial
           @face_value = BigDecimal("0")
         end
 
-        def calculate
+        def calculate_settlement
           @calculation_notes = Array.new
+          if (! @yield_rate)
+            @validation_errors.push("Yield Rate required")
+          end
           validate
 
           if (@validation_errors.size > 0)
@@ -122,8 +125,57 @@ module Financial
           @calculation_successful = true
 
         end
-        def calculate_settlement
-          calculate
+        def calculate
+          calculate_settlement
+        end
+        
+        def calculate_yield
+          guess_count = 0
+          max_guesses = 100
+          match = @amount_settlement
+          pph_dp = (match / @face_value * 100).to_s.sub(/\d*\./, '').size
+          if pph_dp > @pph_rounding_settlement
+            @pph_rounding_settlement = pph_dp
+          end
+          inc = match > face_value ? BigDecimal.new(-1) : BigDecimal.new(1)
+          @yield_rate = BigDecimal.new(@coupon_rate.truncate(),16)
+          calculate_settlement
+          guess = amount_settlement
+          
+          while guess_count < max_guesses && @amount_settlement != match
+            guess_count += 1
+            calculate_settlement
+            
+            # puts "-" * 40
+            #             puts guess_count.to_s + " guess"
+            #             pp @yield_rate
+            #             pp amount_settlement
+            #             pp inc
+            #             pp match
+            #             pp pph_dp
+            #             pp (match / @face_value * 100)
+            #             pp (match / @face_value * 100).to_s.sub(/^\d*\./, '')
+            
+            if @amount_settlement == match
+              break
+            elsif (guess < amount_settlement && amount_settlement > match) || (guess > amount_settlement && amount_settlement < match)
+              inc = inc / 10
+              inc = inc * -1
+            end
+               
+            @yield_rate += inc
+            if @yield_rate == BigDecimal.new(0)
+              inc = inc * -1
+              inc = inc / 10
+              @yield_rate += inc
+            end
+              
+            guess = amount_settlement
+          end
+          
+          @calculation_notes << "Guesses: #{guess_count}"
+          @calculation_successful = guess_count < max_guesses
+
         end
         def validate
           @validation_errors = Array.new
@@ -140,9 +192,7 @@ module Financial
           if (! @coupon_rate)
             @validation_errors.push("Coupon Rate required")
           end
-          if (! @yield_rate)
-            @validation_errors.push("Yield Rate required")
-          end
+          
           if (@override_coupon_period_calc && (! @previous_coupon_date))
             @validation_errors.push("Previous Coupon date required when Coupon Period Calculation Override on")
           end
